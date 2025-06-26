@@ -1,0 +1,64 @@
+# Development build
+FROM node:18-alpine AS development
+
+# Install system dependencies for development
+RUN apk update && apk add --no-cache \
+    build-base \
+    gcc \
+    autoconf \
+    automake \
+    zlib-dev \
+    libpng-dev \
+    vips-dev \
+    git \
+    curl \
+    bash \
+    vim \
+    > /dev/null 2>&1
+
+# Set environment for development
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
+
+# Set working directory
+WORKDIR /opt/
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install node-gyp globally
+RUN npm install -g node-gyp nodemon
+
+# Install all dependencies (including dev dependencies)
+RUN npm config set fetch-retry-maxtimeout 600000 -g && \
+    npm install && \
+    npm cache clean --force
+
+# Set PATH
+ENV PATH=/opt/node_modules/.bin:$PATH
+
+# Set app directory
+WORKDIR /opt/app
+
+# Copy source code
+COPY . .
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S strapi -u 1001
+
+# Change ownership
+RUN chown -R strapi:nodejs /opt/app
+
+# Switch to non-root user
+USER strapi
+
+# Expose port
+EXPOSE 1337
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:1337/_health || exit 1
+
+# Start the application in development mode
+CMD ["npm", "run", "develop"]
