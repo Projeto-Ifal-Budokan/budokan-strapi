@@ -1,6 +1,9 @@
 # Development build
 FROM node:18-alpine AS development
 
+
+
+
 # Install system dependencies for development
 RUN apk update && apk add --no-cache \
     build-base \
