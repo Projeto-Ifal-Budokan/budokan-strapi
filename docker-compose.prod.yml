@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   strapi:
     container_name: strapi-app
@@ -34,7 +32,7 @@ services:
     #   - "1337:1337"
     networks:
       - strapi-network
-      # - swag # Connect to SWAG network
+      - swag_default
     depends_on:
       strapi-mysql:
         condition: service_healthy
@@ -116,6 +114,5 @@ volumes:
 networks:
   strapi-network:
     driver: bridge
-  # External network for SWAG communication
-  # swag:
-  #   external: true
+  swag_default:
+    external: true
