@@ -59,7 +59,7 @@ services:
       # Temporarily disable init.sql to test
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "3309:3306"
+      - "3309:3309"
     networks:
       - strapi-network
       - swag_default
