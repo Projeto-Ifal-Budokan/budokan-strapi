@@ -61,7 +61,7 @@ services:
       # Temporarily disable init.sql to test
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "3306:3306"
+      - "3309:3306"
     networks:
       - strapi-network
     healthcheck:
