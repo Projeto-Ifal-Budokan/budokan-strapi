@@ -1,13 +1,13 @@
 import path from "path";
 
 export default ({ env }) => {
-  const client = env("DATABASE_CLIENT", "sqlite");
+  const client = env("DATABASE_CLIENT", "mysql");
 
   const connections = {
     mysql: {
       connection: {
         host: "localhost",
-        port: 3307,
+        port: 3306,
         database: "strapi-development",
         user: "strapi",
         password: "strapi",

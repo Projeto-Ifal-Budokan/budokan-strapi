@@ -9,21 +9,30 @@ services:
       args:
         NODE_ENV: development
     restart: unless-stopped
-    env_file: .env.dev
     environment:
-      DATABASE_CLIENT: ${DATABASE_CLIENT}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
-      APP_KEYS: ${APP_KEYS}
-      API_TOKEN_SALT: ${API_TOKEN_SALT}
-      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
-      NODE_ENV: ${NODE_ENV}
-      STRAPI_URL: ${STRAPI_URL}
+      # Server
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      STRAPI_PORT: 1337
+      STRAPI_URL: https://strapi.budokanryu.com.br
+      
+      # Database
+      DATABASE_CLIENT: mysql
+      DATABASE_HOST: strapi-mysql-dev
+      DATABASE_PORT: 3306
+      DATABASE_NAME: strapi-development
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+      DATABASE_SSL: false
+      
+      # Secrets
+      APP_KEYS: "4jkZEXetMUmy79/lLwsigw==,3YgxGuRZXlCg4DOKaqD03w==,4YqEUnAOAOeuThLNhai9vQ==,oLqhiS92Maztw75vcm96hg=="
+      API_TOKEN_SALT: wMCiZnn0asYx9qzs4ZE8mA==
+      ADMIN_JWT_SECRET: T1InRz2Lh4VW0gtxbzR0EQ==
+      TRANSFER_TOKEN_SALT: zlgEAVrGtrbLNJg0aW368Q==
+      ENCRYPTION_KEY: eVFU/fHQV//xxHILoUgQSA==
+      JWT_SECRET: 8+sFI4UZXwgNKwcrvurwZQ==
+      
       ENVIRONMENT_MODE: "🚀 DEVELOPMENT MODE ACTIVE 🚀"
     volumes:
       - strapi-uploads:/opt/app/public/uploads
@@ -42,20 +51,19 @@ services:
     command: sh -c "echo '🚀 STARTING STRAPI IN DEVELOPMENT MODE 🚀' && npm run develop"
 
   strapi-mysql:
-    env_file: .env.dev
     container_name: strapi-mysql-dev
     image: mysql:8.0.35
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE_NAME}
-      MYSQL_USER: ${DATABASE_USERNAME}
-      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: strapi-budokanryu
+      MYSQL_DATABASE: strapi-development
+      MYSQL_USER: strapi
+      MYSQL_PASSWORD: strapi
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
-      - "3307:3307"
+      - "3306:3306"
     networks:
       - strapi-network
     healthcheck:
@@ -68,31 +76,29 @@ services:
           "localhost",
           "-u",
           "root",
-          "-p${MYSQL_ROOT_PASSWORD}",
+          "-pstrapi-budokanryu",
         ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
 
-  # redis:
-  #   container_name: strapi-redis-dev
-  #   image: redis:7-alpine
-  #   restart: unless-stopped
-  #   command: redis-server --requirepass ${REDIS_PASSWORD}
-  #   environment:
-  #     REDIS_PASSWORD: ${REDIS_PASSWORD}
-  #   volumes:
-  #     - redis-data:/data
-  #   ports:
-  #     - "6379:6379"
-  #   networks:
-  #     - strapi-network
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-  #     interval: 10s
-  #     timeout: 3s
-  #     retries: 5
+  redis:
+    container_name: strapi-redis-dev
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass strapi-budokanryu
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - strapi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
 volumes:
   mysql-data:
@@ -101,8 +107,8 @@ volumes:
     driver: local
   strapi-data:
     driver: local
-  # redis-data:
-  #   driver: local
+  redis-data:
+    driver: local
 
 networks:
   strapi-network:
