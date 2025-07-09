@@ -6,11 +6,11 @@ export default ({ env }) => {
   const connections = {
     mysql: {
       connection: {
-        host: "localhost",
-        port: 3306,
-        database: "strapi-development",
-        user: "strapi",
-        password: "strapi",
+        host: env("DATABASE_HOST", "localhost"),
+        port: env.int("DATABASE_PORT", 3306),
+        database: env("DATABASE_NAME", "strapi-development"),
+        user: env("DATABASE_USERNAME", "strapi"),
+        password: env("DATABASE_PASSWORD", "strapi"),
         ssl: env.bool("DATABASE_SSL", false) && {
           key: env("DATABASE_SSL_KEY", undefined),
           cert: env("DATABASE_SSL_CERT", undefined),
