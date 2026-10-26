@@ -9,30 +9,24 @@ services:
       args:
         NODE_ENV: development
     restart: unless-stopped
+    # Segredos e credenciais vêm do .env (fora do git). Ver .env.dev.example.
+    env_file: .env
     environment:
       # Server
       NODE_ENV: development
       HOST: 0.0.0.0
       STRAPI_PORT: 1337
-      STRAPI_URL: https://strapi.budokanryu.com.br
-      
-      # Database
+      STRAPI_URL: ${STRAPI_URL:-http://localhost:1337}
+
+      # Database (host/nome do serviço não são segredo; senha vem do .env)
       DATABASE_CLIENT: mysql
       DATABASE_HOST: strapi-mysql-dev
       DATABASE_PORT: 3306
-      DATABASE_NAME: strapi-development
-      DATABASE_USERNAME: strapi
-      DATABASE_PASSWORD: strapi
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_SSL: false
-      
-      # Secrets
-      APP_KEYS: "4jkZEXetMUmy79/lLwsigw==,3YgxGuRZXlCg4DOKaqD03w==,4YqEUnAOAOeuThLNhai9vQ==,oLqhiS92Maztw75vcm96hg=="
-      API_TOKEN_SALT: wMCiZnn0asYx9qzs4ZE8mA==
-      ADMIN_JWT_SECRET: T1InRz2Lh4VW0gtxbzR0EQ==
-      TRANSFER_TOKEN_SALT: zlgEAVrGtrbLNJg0aW368Q==
-      ENCRYPTION_KEY: eVFU/fHQV//xxHILoUgQSA==
-      JWT_SECRET: 8+sFI4UZXwgNKwcrvurwZQ==
-      
+
       ENVIRONMENT_MODE: "🚀 DEVELOPMENT MODE ACTIVE 🚀"
     volumes:
       - strapi-uploads:/opt/app/public/uploads
@@ -56,10 +50,10 @@ services:
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: strapi-budokanryu
-      MYSQL_DATABASE: strapi-development
-      MYSQL_USER: strapi
-      MYSQL_PASSWORD: strapi
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USERNAME}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
@@ -76,7 +70,7 @@ services:
           "localhost",
           "-u",
           "root",
-          "-pstrapi-budokanryu",
+          "-p${MYSQL_ROOT_PASSWORD}",
         ]
       interval: 10s
       timeout: 5s
@@ -87,7 +81,9 @@ services:
     container_name: strapi-redis-dev
     image: redis:7-alpine
     restart: unless-stopped
-    command: redis-server --requirepass strapi-budokanryu
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     volumes:
       - redis-data:/data
     ports:
