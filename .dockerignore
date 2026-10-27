@@ -1,0 +1,28 @@
+# Dependencias e VCS: instaladas/criadas dentro da imagem.
+# Sem esta linha, o `COPY . .` do Dockerfile.prod leva os ~780 MB de node_modules do
+# host para o contexto de build.
+node_modules
+.git
+.gitignore
+
+# Saida de build. Gerada pelo `npm run build` dentro da imagem; levar a copia do host
+# para dentro so faz a imagem carregar artefato velho.
+dist
+.strapi
+
+# Segredos. O runtime recebe tudo por env_file no docker-compose.prod.yml, nada disso
+# precisa estar na imagem. Isto importa: o Dockerfile.prod faz `COPY . .` no estagio de
+# build e depois `COPY --from=build /opt/app ./` no final, entao sem estas linhas o .env
+# (senhas do banco, APP_KEYS, FEEDBACK_SUBMIT_KEY) fica gravado nas camadas da imagem de
+# producao. Testado: `strapi build` passa sem o arquivo presente.
+.env
+.env.*
+!.env.example
+!.env.dev.example
+
+# Artefatos locais que nao pertencem a imagem
+*.bak
+*.sql
+*.sql.gz
+.strapi-updater.json
+deploy.sh
