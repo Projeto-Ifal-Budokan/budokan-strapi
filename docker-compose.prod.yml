@@ -1,8 +1,8 @@
 services:
   strapi:
-    container_name: strapi-app
-    ports:
-      - "1337:1337"
+    container_name: budokan-strapi-app
+    # Sem publicar porta: 1337 ja esta ocupada por outro Strapi nesta maquina.
+    # O SWAG chega aqui pela rede swag_default, no alias budokan-cms.
     build:
       context: .
       dockerfile: Dockerfile.prod
@@ -27,12 +27,11 @@ services:
     volumes:
       - strapi-uploads:/opt/app/public/uploads
       - strapi-data:/opt/app/data
-    # Remove port mapping - accessed through SWAG reverse proxy
-    # ports:
-    #   - "1337:1337"
     networks:
-      - strapi-network
-      - swag_default
+      strapi-network:
+      swag_default:
+        aliases:
+          - budokan-cms
     depends_on:
       strapi-mysql:
         condition: service_healthy
@@ -44,7 +43,7 @@ services:
       start_period: 30s
 
   strapi-mysql:
-    container_name: strapi-mysql
+    container_name: budokan-strapi-mysql
     image: mysql:8.0.35
     restart: unless-stopped
     # FIXED: Removed --authentication-policy parameter
@@ -58,11 +57,9 @@ services:
       - mysql-data:/var/lib/mysql
       # Temporarily disable init.sql to test
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    ports:
-      - "127.0.0.1:3309:3306"
+    # Banco interno: nem porta publicada, nem rede do proxy.
     networks:
       - strapi-network
-      - swag_default
     healthcheck:
       test:
         [
@@ -82,7 +79,7 @@ services:
 
   # Optional: Redis for session management and caching
   redis:
-    container_name: strapi-redis
+    container_name: budokan-strapi-redis
     image: redis:7-alpine
     restart: unless-stopped
     command: redis-server --requirepass ${REDIS_PASSWORD}
@@ -90,8 +87,6 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     volumes:
       - redis-data:/data
-    ports:
-      - "127.0.0.1:6379:6379"
     networks:
       - strapi-network
     healthcheck:
