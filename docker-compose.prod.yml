@@ -1,8 +1,10 @@
 services:
-  strapi:
+  # nome do servico = alias DNS na swag_default compartilhada. Ha outros Strapis
+  # nesta maquina, entao "strapi" generico nao pode virar alias da rede do proxy
+  budokan-cms:
     container_name: budokan-strapi-app
     # Sem publicar porta: 1337 ja esta ocupada por outro Strapi nesta maquina.
-    # O SWAG chega aqui pela rede swag_default, no alias budokan-cms.
+    # O SWAG chega aqui pela rede swag_default pelo nome do servico budokan-cms.
     build:
       context: .
       dockerfile: Dockerfile.prod
@@ -29,9 +31,8 @@ services:
       - strapi-data:/opt/app/data
     networks:
       strapi-network:
+      # sem alias explicito: o nome do servico ja e "budokan-cms"
       swag_default:
-        aliases:
-          - budokan-cms
     depends_on:
       strapi-mysql:
         condition: service_healthy
