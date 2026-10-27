@@ -95,10 +95,18 @@ export default factories.createCoreController(
         ? null
         : Number(payload.rating);
 
-      const created = await strapi.service('api::feedback.feedback').create({
+      // documents() e nao service(): o CoreService.getFetchParams injeta
+      // { status: 'published' } como default, entao service().create() publica a entrada
+      // na hora e a moderacao nao segura nada. Sem status, documents().create() grava como
+      // rascunho (publishedAt null) e e isso que queremos: aparece so depois de aprovar.
+      // validate() ja garantiu que o valor esta em DISCIPLINES; o cast so devolve o tipo
+      const discipline = (asText(payload.discipline) || 'geral') as
+        (typeof DISCIPLINES)[number];
+
+      const created = await strapi.documents('api::feedback.feedback').create({
         data: {
           authorName: asText(payload.authorName),
-          discipline: asText(payload.discipline) || 'geral',
+          discipline,
           rating,
           message: asText(payload.message),
           submittedAt: new Date().toISOString(),
