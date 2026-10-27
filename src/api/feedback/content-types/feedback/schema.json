@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "feedbacks",
+  "info": {
+    "singularName": "feedback",
+    "pluralName": "feedbacks",
+    "displayName": "Feedback",
+    "description": "Depoimentos enviados pelos praticantes pelo site. Entram como rascunho e so aparecem publicamente depois de aprovados no painel."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "authorName": {
+      "type": "string",
+      "required": true,
+      "minLength": 2,
+      "maxLength": 60
+    },
+    "discipline": {
+      "type": "enumeration",
+      "enum": ["karate", "kendo", "archery", "geral"],
+      "default": "geral",
+      "required": true
+    },
+    "rating": {
+      "type": "integer",
+      "min": 1,
+      "max": 5
+    },
+    "message": {
+      "type": "text",
+      "required": true,
+      "minLength": 20,
+      "maxLength": 500
+    },
+    "submittedAt": {
+      "type": "datetime"
+    },
+    "submitterIpHash": {
+      "type": "string",
+      "private": true,
+      "maxLength": 64
+    },
+    "userAgent": {
+      "type": "string",
+      "private": true,
+      "maxLength": 200
+    }
+  }
+}
