@@ -35,8 +35,24 @@
       "minLength": 20,
       "maxLength": 500
     },
+    "authorPhotoUrl": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "consentAt": {
+      "type": "datetime"
+    },
+    "consentVersion": {
+      "type": "string",
+      "maxLength": 20
+    },
     "submittedAt": {
       "type": "datetime"
+    },
+    "googleSub": {
+      "type": "string",
+      "private": true,
+      "maxLength": 64
     },
     "submitterIpHash": {
       "type": "string",
