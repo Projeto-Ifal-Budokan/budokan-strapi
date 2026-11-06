@@ -3,6 +3,8 @@ import type { Core } from '@strapi/strapi';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
+import { seedFeaturedFeedbacks } from './seed/feedback';
+
 /**
  * Acoes que o papel Public recebe nesta API.
  *
@@ -184,5 +186,8 @@ export default {
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await grantPublicFeedback(strapi);
     await scheduleFeedbackRetention(strapi);
+    // por ultimo: o seed le e escreve conteudo, e nao ha nada nele que dependa do resto do
+    // boot. ele proprio decide se roda (FEEDBACK_SEED_ENABLED) e nao derruba nada
+    await seedFeaturedFeedbacks(strapi);
   },
 };
