@@ -23,11 +23,12 @@ const NAME_MIN = 2;
 const NAME_MAX = 60;
 const MESSAGE_MIN = 20;
 /**
- * 600 e nao 500: o depoimento de destaque mais longo que ja estava no site tem 502
- * caracteres. Com o limite antigo o seed era rejeitado pela validacao e o texto teria que
- * ser cortado para caber, o que e mexer na palavra de quem escreveu.
+ * 1000: o depoimento de destaque mais longo que ja estava no site tem 502 caracteres, e o
+ * limite precisa sobra para quem escreve com calma. Ele fica acima do que o frontend aceita
+ * de proposito — o CMS e a ultima barreira, entao ele e mais folgado; quem chega pelo site
+ * ve o limite de 1000 e recebe a mensagem antes de enviar.
  */
-const MESSAGE_MAX = 600;
+const MESSAGE_MAX = 1000;
 const SUB_MAX = 64;
 /** consentimento precisa ser fresco: mais que isso e replay de um aceite velho */
 const CONSENT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
